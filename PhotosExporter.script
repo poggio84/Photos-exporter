@@ -1,0 +1,29 @@
+set dest to "destination_folder" as POSIX file as text -- the destination folder (use a valid path)  
+
+tell application "Photos"
+	repeat with photosFolder in folders
+		set tFolder to get name of photosFolder
+		set tFolder to dest & (get name of photosFolder)
+		
+		my makeFolder(tFolder)
+		
+		set currentPath to tFolder as text
+		set photoAlbums to albums in photosFolder
+		repeat with photoAlbum in photoAlbums
+			set tAlbum to get (name of photoAlbum)
+			
+			tell application "Finder"
+				make new folder at currentPath with properties {name:tAlbum}
+			end tell
+			log currentPath & tAlbum & ":"
+			
+			export (get media items of album tAlbum) to (currentPath & ":" & tAlbum as alias) without using originals
+			
+		end repeat
+	end repeat
+end tell
+
+
+on makeFolder(tPath)
+	do shell script "mkdir -p " & quoted form of POSIX path of tPath
+end makeFolder
